@@ -1,30 +1,29 @@
 name: Run Combot Bot
 
 on:
-  workflow_dispatch: # This enables the manual "Run workflow" button
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: windows-latest
-    timeout-minutes: 360 # 6 hours
+    timeout-minutes: 360
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Prepare D: drive and copy files
-      run: |
-        # Create a folder on Disk D:
-        New-Item -Path D:\bot -ItemType Directory -Force
-        
-        # Copy your files from the repository to Disk D:
-        Copy-Item -Path .\combobot.exe -Destination D:\bot\combobot.exe
-        Copy-Item -Path .\run.ps1 -Destination D:\bot\run.ps1
-        
-        Write-Host "Files copied to D:\bot"
+      - name: Prepare D drive and copy files
+        shell: pwsh
+        run: |
+          New-Item -Path "D:\bot" -ItemType Directory -Force
 
-    - name: Run the bot
-      run: |
-        # Change directory to D:\bot and execute the script
-        cd D:\bot
-        powershell -File .\run.ps1
+          Copy-Item -Path ".\combobot.exe" -Destination "D:\bot\combobot.exe" -Force
+          Copy-Item -Path ".\run.ps1" -Destination "D:\bot\run.ps1" -Force
+
+          Write-Host "Files copied to D:\bot"
+
+      - name: Run the bot
+        shell: pwsh
+        run: |
+          Set-Location "D:\bot"
+          powershell -ExecutionPolicy Bypass -File ".\run.ps1"
